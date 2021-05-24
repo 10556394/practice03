@@ -1,0 +1,132 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">{{ username }}のプロフィール</p>
+      {% if username == request.session.username %}
+        <p class="is_follow_box">あなた</p>
+      {% endif %}
+      {% if is_follow %}
+        <p class="is_follow_box"><a href="{% url 'users:show_follow_user' %}">フォロー中</a></p>
+      {% endif %}
+
+      {% if message %}
+        <p class="mb10 message_style2 fadeout2">{{ message }}</p>
+      {% endif %}
+
+      <div id="profile">
+        <a href="{{ photo.url }}">
+          <img class="imgsize_500 float_left" src="{{ photo.url }}" alt="">
+        </a>
+        <div class="invisible">
+          <span id="invibible_box_for_get_ability_power_t">パワー</span>
+          <span id="invibible_box_for_get_ability_speed_t">スピード</span>
+          <span id="invibible_box_for_get_ability_magic_t">魔力</span>
+          <span id="invibible_box_for_get_ability_brain_t">頭脳</span>
+          <span id="invibible_box_for_get_ability_gard_t">物理防御</span>
+          <span id="invibible_box_for_get_ability_magicgard_t">魔法防御</span>
+          <span id="invibible_box_for_get_ability_power">{{ ability_power }}</span>
+          <span id="invibible_box_for_get_ability_speed">{{ ability_speed }}</span>
+          <span id="invibible_box_for_get_ability_magic">{{ ability_magic }}</span>
+          <span id="invibible_box_for_get_ability_brain">{{ ability_brain }}</span>
+          <span id="invibible_box_for_get_ability_gard">{{ ability_gard }}</span>
+          <span id="invibible_box_for_get_ability_magicgard">{{ ability_magicgard }}</span>
+        </div>
+        <div class="radar_chart_of_profile_box">
+          <h2>スキル</h2>
+          <canvas id="radar_chart_of_profile" width="100" height="100"></canvas>
+        </div>
+
+        <div class="ability_box">
+          <div class="greeting_box mt40">
+            自己紹介：{{ greeting | linebreaksbr }}
+          </div>
+
+          <!-- パートナー情報 //-->
+          {% if partner %}
+            <div class="partner_box">
+              <a href="{% url 'users:profile_show' partner_name %}">
+                {% if partner_photo %}
+                  <img src="{{ partner_photo.url }}" alt="">
+                {% else %}
+                  {% load static %}
+                  <img src="{% static 'users/images/no_image_face.png' %}" alt="">
+                {% endif %}
+              </a>
+              <p>パートナー： {{ partner_name }}</p>
+            </div>
+          {% else %}
+            <div class="partner_box">&nbsp;</div>
+          {% endif %}
+
+
+        </div>
+
+        <!-- フォローボタン //-->
+        <div class="link_to_follow_box">
+
+          <!-- 自分のプロフィールだったら、フォローボタンは表示しない //-->
+          {% if username != request.session.username %}
+            {% if is_follow %}
+              <!-- CSS作るのがめんどいので、divごとつかいまわし //-->
+              <div class="show_more_box">
+                <a class="show_more_button" href="{% url 'users:follow_release' username %}">- フォロー解除</a>
+              </div>
+            {% else %}
+              <div class="show_more_box">
+                <a class="link_to_follow button_link_to_anything" href="{% url 'users:follow_regist' username %}">+ フォローする</a>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- スタイル調整用のタグ //-->
+        <div class="adjust_box_in_profile_show"></div>
+
+        <!-- 記事のトップ8取得 //-->
+        <div class="profile_article">
+          <p class="title">投稿記事</p>
+            {% for article in articles %}
+              <div class="profile_article_box">
+                {% load my_templatetags %}
+                {% set is_best_selected = False %}
+                <a href="{% url 'users:article_show' article.id %}">
+                <!-- Memo ↓こういう場合、まず QuerySetを取得が必須。for でレコード抽出。そして、ドットでobjectにアクセス for photo in article.art_image.image.url.all じゃ、だめ。 //-->
+                  {% for photo in article.art_image.all %}
+
+                    <!-- is_bestがある時 //-->
+                    {% if photo.is_best %}
+                      <img class="profile_article_photo" src="{{ photo.image.url }}" alt="">
+                      {% set is_best_selected = True %}
+                    {% endif %}
+
+                    <!-- is_bestがないとき //-->
+                    {% if forloop.last %}
+                      {% if not is_best_selected %}
+                        {% for photo in article.art_image.all|slice:1 %}
+                          <img class="profile_article_photo" src="{{ photo.image.url }}" alt="">
+                        {% endfor %}
+                      {% endif %}
+                    {% endif %}
+
+                  <!-- 画像の登録がないとき //-->
+                  {% empty %}
+                    <img class="profile_article_photo alpha30" src="{% static 'users/images/no-image.png' %}" alt="">
+                  {% endfor %}
+
+                <p class="art_title">{{ article.title }}</p>
+                </a>
+              </div>
+            {% empty %}
+              <p class="center mt50">まだ記事が投稿されていません</p>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content %}

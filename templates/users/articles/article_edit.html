@@ -1,0 +1,44 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">{{ username }}の記事編集</p>
+
+      <div id="article">
+        <form class="article_edit_form" action="{% url 'users:article_edit_run' id %}" method="post"  enctype="multipart/form-data">
+          <!-- 編集フォーム //-->
+          {% for form in forms %}
+            {{ form.label }}<br>{{ form }} <br>
+          {% endfor %}
+          <!-- 画像フォーム //-->
+          {% for photo_form in photo_forms %}
+            <div class="article_edit_photo_box">
+              {% if photo_form.image.initial.url %}
+                <img id="target_img_tag{{ forloop.counter0 }}" class="article_edit_preview_photo" src="{{ photo_form.image.initial.url }}" alt=""><br>
+              {% else %}
+                {% load static %}
+                <img id="target_img_tag{{ forloop.counter0 }}" class="article_edit_preview_photo alpha30" src="{% static 'users/images/plus.png' %}" alt="">
+              {% endif %}
+              <div class="design_custom_file_input2">
+                {{ photo_form }}
+              </div>
+            </div>
+          {% endfor %}
+
+          {{ photo_forms.management_form }}
+          {% csrf_token %}
+          <div class="clear_both mb30"></div>
+          <input type="submit" name="" value="編集">
+        </form>
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+  {% load static %}
+  <script type="text/javascript" src="{% static 'users/js/preview_layzy.js' %}"></script>
+
+{% endblock content %}

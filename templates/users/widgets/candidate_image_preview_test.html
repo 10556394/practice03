@@ -1,0 +1,140 @@
+
+<h2>次は... 画像の選択まで行けた。あとはPOST送信と、その後の処理</h2>
+コメント:<br>
+SelectボックスのoptionからURLを取得できた！いけそう！（2021.05.06 ） <br>
+いや、Django の select widgetは、どうやって画像名を取得しているんだろうか？それを調べれば、一歩進められるかもしれない。（2021.05.05_02 ）<br>
+本当は、フォームで選択した画像を、自作widgetで表示する形にしたかったが、困難と判断。（2021.05.05_01 ） <br>
+<br>
+
+<h2>▼ widgetの要素?一覧 </h2>
+{% for w in widget %}
+  {{ w }} <br>
+{% endfor %}<br><br>
+
+<h2>中身 <small style="font-size:0.7em;">（下記一覧は、widget CandidateImagePreview(forms.ClearableFileInput)とした場合 ）</small></h2>
+name：{{widget.name}} <br>
+is_hidden：{{widget.is_hidden}}<br>
+required：{{widget.required}}<br>
+value：{{widget.value}}<br>
+arrtr：{{widget.attrs}}<br>
+template_name：{{widget.template_name}}<br>
+type：{{widget.type}}<br>
+checkbox_name：{{widget.checkbox_name}}<br>
+checkbox_id：{{widget.checkbox_id}}<br>
+is_initial：{{widget.is_initial}}<br>
+input_text：{{widget.input_text}}<br>
+initial_text：{{widget.initial_text}}<br>
+clear_checkbos_label：{{widget.clear_checkbox_label}}<br>
+optgroups：{{ widget.optgroups }} <br>
+label：{{ widget.label }} <br><br>
+
+{{ widget.optgroups.label }}<br><br>
+
+<h2>▼ Select option widgetより、中身を抽出</h2>
+<!--
+path C:\Users\tanak\anaconda3\Lib\site-packages\django\forms\templates\django\forms\widgets
+file select_option.html
+中身全文
+<option value="{{ widget.value|stringformat:'s' }}"{% include "django/forms/widgets/attrs.html" %}>{{ widget.label }}</option>
+//-->
+{{ widget.value|stringformat:'s' }}<br>
+{% include "django/forms/widgets/attrs.html" %}<br>
+{{ widget.label }}<br><br>
+
+<h2>▼ Select widget本体</h2>
+<!--
+path C:\Users\tanak\anaconda3\Lib\site-packages\django\forms\templates\django\forms\widgets
+file select.html
+//-->
+<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+  {% for group_name, group_choices, group_index in widget.optgroups %}
+    {% if group_name %}
+      <optgroup label="{{ group_name }}">
+    {% endif %}
+    {% for option in group_choices %}
+      <!-- ↓どうやらこの箇所が、SelectBoxの中身らしい //-->
+      {% include option.template_name with widget=option %} <br>
+    {% endfor %}
+    {% if group_name %}
+  </optgroup> <br>
+    {% endif %}
+  {% endfor %}
+</select>
+<br>
+<!-- django/forms/widgets/attrs.html の中身全文 //-->
+{% for name, value in widget.attrs.items %}
+  {% if value is not False %}
+    {{ name }}
+    {% if value is not True %}="{{ value|stringformat:'s' }}"
+    {% endif %}
+  {% endif %}
+{% endfor %}
+<br><br>
+<!-- ↑ django/forms/widgets/attrs.html の中身 //-->
+
+
+<h2>▼ 画像URLの取り出し</h2>
+{% for group_name, group_choices, group_index in widget.optgroups %}
+
+  {% for option in group_choices %}
+  <div class="candidate_tag_image_box">
+    <p>
+      <a href="javascript:void(0)">
+        <img id="candidate_tag_image{{ forloop.parentloop.counter }}" style="width:100px; height:100px; object-fit:cover;" src="{{ option.label }}" alt="">
+      </a>
+      <input style="visibility:hidden" id="candidate_tag_checkbox{{ forloop.parentloop.counter }}" type="checkbox" name="candidate_tag_checkbox" value="{{ option.value }}">
+    </p>
+
+    <div style="width:60%;">
+      {{ option }} <br>
+      value：{{ option.value }} <br>
+      URL1：{{ option.label }} <br>
+      URL2：{% include option.template_name with widget=option %}
+      選択状態：{{ option.selected }}<br><br>
+    </div>
+  </div>
+  {% endfor %}
+{% endfor %}
+<br><br>
+
+<script type="text/javascript">
+  window.onload = function(){
+    roop_cnt = document.getElementsByClassName('candidate_tag_image_box').length
+    for (let i=1; i<=roop_cnt; i++){
+      document.getElementById('candidate_tag_image' + i).addEventListener('click', function(){
+        if (document.getElementById('candidate_tag_checkbox' + i).checked == true){
+          document.getElementById('candidate_tag_checkbox' + i).checked = false
+          document.getElementById('candidate_tag_image' + i).style.border = 'none'
+        } else {
+          for (let n=1; n<=roop_cnt; n++){
+            document.getElementById('candidate_tag_checkbox' + n).checked = false
+            document.getElementById('candidate_tag_image' + n).style.border = 'none'
+          }
+          document.getElementById('candidate_tag_checkbox' + i).checked = true
+          document.getElementById('candidate_tag_image' + i).style.border = '5px #FFB74B solid'
+        }
+      })
+    }
+  }
+</script>
+
+<h2>▼ 作成Selectフォーム</h2>
+<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+  {% for group_name, group_choices, group_index in widget.optgroups %}
+    {% if group_name %}
+      <optgroup label="{{ group_name }}">
+    {% endif %}
+    {% for option in group_choices %}
+      <option value="{{ option.value }}">
+        {{ option.label }}
+      </option>
+    {% endfor %}
+    {% if group_name %}
+  </optgroup>
+    {% endif %}
+  {% endfor %}
+</select>
+<br>
+
+
+<h2>↑ 自作widget ここまで ↑</h2>

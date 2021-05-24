@@ -1,0 +1,21 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+<form class="" action="{% url 'users:login' %}" method="post">
+  {% csrf_token %}
+  {% for form in forms %}
+    {{ form.label }} - {{ form }} <br>
+  {% endfor %}
+
+  <!-- 何か間違いがあった時の処理 //-->
+  {% if message %}
+  <div class='errorMessage'>
+    {{ message }}
+  </div>
+  {% endif %}
+
+  <input type="submit" name="" value="ログイン">
+</form>
+
+<a href="{% url 'users:reset_password' %}">パスワードを忘れた場合はこちら（自作版）</a><br>
+<a href="{% url 'users:reset_password2' %}">パスワードを忘れた場合はこちら（DjangoView版）</a>

@@ -1,0 +1,17 @@
+{% extends 'users/base.html' %}
+{% block content %}
+
+{% for photo in photos %}
+  <img class="login_preview_image lazyload" data-src="{{ photo.image.url }}" alt="" >
+{% endfor %}
+
+<div class="for_login_dark_over_line"></div>
+
+<div id="to_login" class="with_preview_images">
+  <div class="mt240">
+    <a class="btn btn--orange btn--radius" href="{% url 'users:login3' %}">ログイン</a> <br>
+    <a class="btn btn--orange btn--radius" href="{% url 'users:user_form' %}">登録フォームへ</a> <br>
+  </div>
+</div>
+
+{% endblock content %}

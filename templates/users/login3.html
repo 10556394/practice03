@@ -1,0 +1,23 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+<div id="login" class="mt150_i">
+
+  <form name="form-login" class="" action="" method="post">
+
+    {% csrf_token %}
+    {% for field in form %}
+      <span></span>{{ field }} <br>
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <p>{{ error }} </p><br>
+    {% endfor %}
+
+    <input type="submit" name="" value="ログイン">
+    <p class="center  mt50"><a href="{% url 'users:reset_password2' %}">パスワードを忘れた方はこちら</a></p>
+  </form>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">{{ username }}の投稿記事一覧</p>
+      <div id="article">
+        {% if message %}
+          <p class="message_style2 fadeout2">{{ message }}</p>
+        {% endif %}
+        {% for article in articles %}
+          <div class="article_list_box">
+            <!-- image //-->
+            <a href="{% url 'users:article_show' article.id %}">
+              {% load my_templatetags %}
+              {% set is_selected = False %}
+              <!-- 記事写真を丸っと検索 //-->
+              {% for photo in article.art_image.all %}
+                <!-- is_bestならそれを採用（ただし、choiceは１枚のみ） //-->
+                {% if not is_selected and photo.is_best %}
+                  <img class="article_list_photo" src="{{ photo.image.url }}" alt="">
+                  {% set is_selected = True %}
+                {% endif %}
+                <!-- is_bestが存在しなければ、もう一度写真を検索し、最初の１枚を採用。 //-->
+                {% if forloop.last %}
+                  {% if not is_selected %}
+                    {% for photo in article.art_image.all|slice:1 %}
+                      <img class="article_list_photo"  src="{{ photo.image.url }}" alt="">
+                    {% endfor %}
+                  {% endif %}
+                {% endif %}
+              {% empty %}
+                {% load static %}
+                <img class="article_list_photo alpha30"  src="{% static 'users/images/no-image.png' %}" alt="">
+              {% endfor %}
+            </a>
+
+            <!-- others //-->
+            <p><a href="{% url 'users:article_show' article.id %}">{{ article.title | truncatechars:30 }}</a></p>
+            <p class="small">
+              {{ article.posted_date }}<br>
+              コメント ( {{ article.commented_article.count }} )
+            </p>
+            <p>
+              <a href="{% url 'users:article_edit' article.id %}">編集</a>
+              &nbsp;
+              <a href="{% url 'users:article_delete' article.id %}">削除</a>
+            </p>
+
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+{% endblock content %}

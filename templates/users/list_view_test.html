@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    {% for user in object_list %}
+    <a href="{% url 'users:detail_view_test' user.uuid %}">{{ user.username }}</a><br>
+      {{ user.uuid }}<br>
+      {{ user.email }}<br>
+      ---------------------<br>
+    {% endfor %}
+
+  </body>
+</html>

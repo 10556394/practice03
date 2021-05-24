@@ -1,0 +1,11 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+<div class="message_box">
+  <div class="center">
+    <p>{{ message | linebreaksbr  }}</p>
+    <a class="btn btn--orange btn--radius" href="{% url 'users:index' %}">トップページへ</a>
+  </div>  
+</div>
+{% endblock content%}

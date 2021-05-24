@@ -1,0 +1,19 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/left.html' %}
+    <div id="main">
+      <p class="page_title">{{ username }}のプロフィール</p>
+
+      <div id="profile">
+        <p class="center">{{ username }}のプロフィールは、登録されていません。</p>
+        {% if message %}
+          <p class="center mb10 mt50 message_style2 fadeout2">{{ message }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,17 @@
+<div id="left">
+  <h3>メニュー</h3>
+  <ul>
+    <li><a href="{% url 'users:article_form2' %}">記事を投稿</a></li>
+    <li><a href="{% url 'users:show_my_article_list' %}">記事を編集</a></li>
+    <li><a href="{% url 'users:profile_form' %}">プロフィール</a></li>
+    <li><a href="{% url 'users:album_show' %}">マイアルバム</a></li>
+    <li><a href="{% url 'users:bookmark_show' %}">お気に入り</a></li>
+    <li><a href="{% url 'users:show_follow_user' %}">フォロー一覧</a></li>
+  </ul>
+  <h3>設定</h3>
+  <ul>
+    <li><a href="{% url 'users:change_password' %}">パスワードの変更</a></li>
+    <li>閲覧設定</li>
+    <li>プレミアム登録</li>
+  </ul>
+</div>

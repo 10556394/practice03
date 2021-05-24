@@ -1,0 +1,66 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">{{ username }}のプロフィール</p>
+      <div id="article">
+
+        <!-- forms.ValidationErrorの動作確認用の項目：これを表示すると、エラーメッセージの挙動がよくわかる
+        {{ error_msg }}
+        //-->
+
+        {% if message %}
+          <p class="center mb50">{{ message }}</p>
+        {% endif %}
+
+        <form class="post-form-to-edit-portfolio" action="{% url 'users:profile_regist' %}" method="post" enctype="multipart/form-data">
+          <!-- 登録済みの画像をプレビューするために、まずここで画像を読み込んでおく //-->
+          {% if photo.image.initial.url %}
+            <img src="{{ photo.image.initial.url }}" id="for_default_preview_image" class="hidden" alt="">
+          {% else %}
+            {% load static %}
+            <img src="{% static 'users/images/no_image_face.png' %}" id="for_default_preview_image" class="hidden" alt="">
+          {% endif %}
+
+          <div class="design_custom_file_input">
+            {{ photo.as_p }} {{ form.media }} <br>
+          </div>
+
+          <!-- 入力フォーム  //-->
+          {% for form in forms %}
+            {{ form.label }}<br>
+            {% if 'Ability' in form.label %}
+              <div class="invisible_i">{{ form }}</div>
+            {% else %}
+              {{ form }}
+            {% endif %}
+
+            {% if 'Ability' in form.label %}
+              <span id="for_get_target_id{{ forloop.counter }}" class="invisible_i">{{ form.name }}</span>
+              <input id="ability_slider{{ forloop.counter }}" class="input_range_for_profile" type="range" name="{{ form.label }}" min=0 max=10 step=1 list="tlist{{ forloop.counter }}">
+              <canvas class="slider_line_canvas_zone" id="canvas_zone{{ forloop.counter }}" width=700 height=25></canvas>
+              <output class="ability_output_number" id="ability_output{{ forloop.counter }}">{{ form.value }}</output>
+            {% endif %}
+
+            <!-- バリデーションエラーが発生した場合、エラーメッセージを表示 //-->
+            {% if form.errors %}
+              {{ form.errors }}<br>
+            {% endif %}
+            <br><br>
+          {% endfor %}
+
+          {% csrf_token %}
+          <input type="submit" name="" value="保存">
+          <div class="delete_button_box">
+            <p class="delete_button"><a href="{% url 'users:profile_delete' username %}">削除</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content %}

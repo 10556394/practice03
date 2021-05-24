@@ -1,0 +1,19 @@
+{% extends 'users/base.html' %}
+
+{% block content  %}
+  <p class="center mt50">{{ user.username }}さんの、情報登録</p>
+  <div id="login">
+    <form class="" action="{% url 'users:regist_user_info' user.uuid %}" method="post">
+      {% csrf_token %}
+      {% for form in forms %}
+        {{ form.label }} {{ form }} <br>
+      {% endfor %}
+
+      {% if message %}
+        <p>{{ message }}</p>
+      {% endif %}
+      <input type="submit" name="" value="登録する">
+    </form>
+  </div>
+
+{% endblock content %}

@@ -1,0 +1,40 @@
+
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">マイアルバム</p>
+      <div class="album_box">
+        <!-- 登録されている写真があれば表示 //-->
+        {% if albums %}
+          <form class="" action="{% url 'users:album_release' %}" method="post">
+            {% for album in albums %}
+              <div class="photo_box">
+                <a href="{{ album.photo.image.url }}"><img class="album_photo" src="{{ album.photo.image.url }}" alt=""></a>
+                <input class="album_release_check" type="checkbox" name="album_release_check" value="{{ album.id }}">
+                <div class="user_art_box_under_photo">
+                  <a href="{% url 'users:profile_show' album.photo.article.user.username %}"><img src="{{ album.photo.article.user.person.image.url }}" alt=""></a>
+                  <p class="name">記事：{{ album.photo.article.user.username }}</p>
+                  <p class="title"><a href="{% url 'users:article_show' album.photo.article.id %}">{{ album.photo.article.title|truncatechars:12 }}</a></p>
+                </div>
+              </div>
+            {% endfor %}
+            <p class="clear_both">
+              {% csrf_token %}
+              <input class="button_link_to_anything wid40p" type="submit" name="" value="チェックした画像のアルバム登録を解除する">
+            </p>
+          </form>
+        <!-- 登録写真がなければ、メッセージ //-->
+        {% else %}
+          <p class="center">アルバム登録されている写真がありません</p>
+        {% endif %}
+
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content %}

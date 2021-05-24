@@ -1,0 +1,32 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  <p class="center mt50 fts30">アカウントを作成</p>
+
+<div id="login">
+
+  <form class="" action="{% url 'users:user_form' %}" method="post">
+    {% csrf_token %}
+        {% for form in forms %}
+            {{ form.label }}<br>
+            <span></span>{{ form }}<br>
+        {% endfor %}
+
+    <!-- パスワードが間違った場合などのエラーメッセージ -->
+    {% if forms.non_field_errors %}
+    <div class='errorMessage'>{{ forms.non_field_errors }}</div>
+    {% endif %}
+
+    <!-- データベース登録上の問題があった場合 //-->
+    {% if message %}
+    <div class='errorMessage'>
+      {{ message }}
+    </div>
+    {% endif %}
+
+    <input type="submit" name="" value="会員登録">
+  </form>
+
+</div>
+
+{% endblock content %}

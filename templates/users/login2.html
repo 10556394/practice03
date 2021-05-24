@@ -1,0 +1,15 @@
+ログイン画面 No2<br><br>
+
+<form class="" action="" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    {{ field.label }} - {{ field }} <br>
+  {% endfor %}
+
+  {% for error in form.non_field_errors %}
+    {{ error }} <br>
+  {% endfor %}
+
+
+  <input type="submit" name="" value="ログイン">
+</form>

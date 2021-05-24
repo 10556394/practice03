@@ -1,0 +1,87 @@
+
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">お気に入りリスト</p>
+
+      {% if message %}
+        <p class="message_style2 fadeout2 mb30">{{ message }}</p>
+      {% endif %}
+
+      <!-- ブックマークがあれば、表示 //-->
+      {% if bookmarks %}
+        <!-- お気に入りを表示する全体ボックス //-->
+        <div class="bookmark_box">
+          <form class="" action="{% url 'users:bookmark_release' %}" method="post">
+            <!-- お気に入り記事 //-->
+            {% for bookmark in bookmarks %}
+              <div class="art_box">
+                <!-- 記事の代表画像とリンク //-->
+                <a href="{% url 'users:article_show' bookmark.article.id %}">
+                  {% if bookmark.article.art_image.all %}
+                    {% load my_templatetags %}
+                    {% set is_photo_selected = False %}
+
+                    {% for photo in bookmark.article.art_image.all %}
+                      {% if not is_photo_selected and photo.is_best %}
+                        <img class="art_photo lazyload"  data-src="{{ photo.image.url }}" alt="">
+                        {% set is_photo_selected = True %}
+                      {% endif %}
+
+                      <!-- is_bestが存在しなかったときの処理。viewで画像を選ばなかったので、非効率な処理になっている //-->
+                      {% if forloop.last %}
+                        {% if not is_photo_selected %}
+                          {% for photo in bookmark.article.art_image.all|slice:1 %}
+                            <img class="art_photo lazyload" src="{{ photo.image.url }}" alt="">
+                          {% endfor %}
+                        {% endif %}
+                      {% endif %}
+
+                    {% endfor %}
+                  {% else %}
+                    {% load static %}
+                    <img  class="art_photo  no-image" src="{% static 'users/images/no-image.png' %}" alt="">
+                  {% endif %}
+                </a>
+                <!-- ブックマーク解除チェック //-->
+                <input class="bookmark_release_check" type="checkbox" name="bookmark_release_check" value="{{ bookmark.id }}">
+                <!-- タイトルと記事の抜粋 //-->
+                <p class="title">{{ bookmark.article.title|truncatechars:10 }}</p>
+                <p class="body">{{ bookmark.article.body|truncatechars:20 }}</p>
+                <!-- 記事を書いたユーザー情報 //-->
+                <div class="user_box mt20">
+                  <a href="{% url 'users:profile_show' bookmark.article.user.username %}">
+                    {% if bookmark.article.user.person.image %}
+                      <img class="user_image" src="{{ bookmark.article.user.person.image.url }}" alt="">
+                    {% else %}
+                      {% load static %}
+                      <img class="user_image" src="{% static 'users/images/no_image_face.png' %}" alt="">
+                    {% endif %}
+                  </a>
+                  <span class="name">{{ bookmark.article.user.username }}</span>
+                  <span class="date">{{ bookmark.article.posted_date }}</span>
+                </div>
+              </div>
+          {% endfor %}
+          {% csrf_token %}
+          <p class="clear_both">
+            <input class="button_link_to_anything wid20p" type="submit" name="" value="お気に入り解除">
+          </p>
+          </form>
+        </div>
+
+      <!-- ブックマークがなければ、メッセージを表示 //-->
+      {% else %}
+        <p class="center">ブックマークされた記事がありません。</p>
+      {% endif %}
+
+
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content %}

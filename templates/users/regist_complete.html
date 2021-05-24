@@ -1,0 +1,13 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+  <div class="center">
+    ようこそ、{{ user.username }}さん。 <br>
+    ID：{{ user.uuid }} <br><br>
+
+    {{ message }} <br><br><br>
+    <a class="btn btn--orange btn--radius" href="{% url 'users:regist_user_info' user.uuid %}">職群と氏名を登録する</a>
+  </div>
+
+{% endblock content %}

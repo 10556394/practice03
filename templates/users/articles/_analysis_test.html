@@ -1,0 +1,52 @@
+<h2>{{ username }}</h2>
+<p class="mb50">
+  <a href="{% url 'users:index' %}">トップへ戻る</a>
+</p>
+
+<h3>tag_dict（ Noneを含む、訪問済みタグのdict ）</h3>
+{% for value in values %}
+  {{ value }}
+{% endfor %}
+<br>
+
+<h3>tags（ Noneを除外した、訪問済みのタグ一覧 ）</h3>
+{% for value in values2 %}
+  {{ value }}
+{% endfor %}
+<br>
+
+<h3>e_tags（ Noneを除外した、未訪問のタグ一覧 ）</h3>
+{% for value in values3 %}
+  {{ value }}
+{% endfor %}
+<br>
+
+<h3>tag_all（ すべてのタグ一覧：PVの多い訪問済みタグ ⇒ 未訪問タグ の順 ）</h3>
+{% for value in values4 %}
+  {{ value }}
+{% endfor %}
+<br>
+
+<h3>タグのついている記事</h3>
+{% for article in articles %}
+  {{ article.title }} <br>
+{% endfor %}
+<br><br>
+
+<h3>タグのついていない記事</h3>
+{% for article in articles_tag_none %}
+  {{ article.title }} <br>
+{% endfor %}
+<br>
+
+<h3>art_objs</h3>
+{% for arts in art_objs %}
+  {{ arts }} <br>
+{% endfor %}
+<br>
+
+<h3>art_all：記事数 {{ art_cnt }}</h3>
+{% for art in art_all %}
+  {{ forloop.counter }}：{{ art.user.username }} - {{ art }} <br>
+{% endfor %}
+<br>

@@ -1,0 +1,136 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">マイページ</p>
+
+      <!-- 投稿記事ボックス //-->
+      <div class="my_page_box_type1">
+        <div class="title_box">
+          <p class="box_page_title">最近投稿した記事</p>
+          {% if articles %}
+            <p class="all_show_link"><a href="{% url 'users:show_my_article_list' %}">すべて見る</a></p>
+          {% endif %}
+        </div>
+        <!-- 記事一覧 //-->
+        {% for article in articles|slice:5 %}
+          <div class="my_page_article_box">
+            <a href="{% url 'users:article_show' article.id %}">
+              {% load my_templatetags %}
+              {% set is_selected = False %}
+              {% for photo in article.art_image.all %}
+                {% if photo.is_best %}
+                  <img class="my_page_article_photo" src="{{ photo.image.url }}" alt="">
+                  {% set is_selected = True %}
+                {% endif %}
+                {% if forloop.last %}
+                  {% if not is_selected %}
+                    {% for photo in article.art_image.all|slice:1 %}
+                      <img class="my_page_article_photo" src="{{ photo.image.url }}" alt="">
+                    {% endfor %}
+                  {% endif %}
+                {% endif %}
+              {% empty %}
+                {% load static %}
+                <img class="my_page_article_photo alpha30" src="{% static 'users/images/no-image.png' %}" alt="">
+              {% endfor %}
+            </a>
+            <p class="my_page_article_title"><a href="{% url 'users:article_show' article.id %}">{{ article.title|truncatechars:15 }}</a></p>
+            <p class="my_page_article_comment">コメント {{ article.commented_article.count }}件</p>
+            <p class="my_page_article_posted">{{ article.posted_date }}</p>
+          </div>
+        {% empty %}
+          <p class="center mt50 mb50">あなたの記事を投稿してみよう</p>
+          <p class="center"><a class="button_link_to_anything2" href="{% url 'users:article_form2' %}">+ 記事を投稿する</a></p>
+        {% endfor %}
+      </div>
+
+      <!-- フォロー者の投稿記事 //-->
+      <div class="my_page_box_type2 ml5p">
+        <p class="box_page_title">フォロワーの最新記事</p>
+        <p class="link_to_list"><a href="{% url 'users:show_follow_user' %}">一覧</a></p>
+        {% if followers_article %}
+          <div class="my_page_follower_art_box">
+            <a href="{% url 'users:article_show' followers_article.id %}">
+              <p class="followers_artitle_title">{{ followers_article.title|truncatechars:15 }}</p>
+              {% load my_templatetags %}
+              {% set is_selected = False %}
+              {% for photo in followers_article.art_image.all %}
+                {% if photo.is_best %}
+                  <img class="follower_article_image alpha30" src="{{ photo.image.url }}" alt="">
+                  {% set is_selected = True %}
+                {% endif %}
+                {% if forloop.last %}
+                  {% if not is_selected %}
+                    <img class="follower_article_image alpha30" src="{{ photo.image.url }}" alt="">
+                  {% endif %}
+                {% endif %}
+              {% empty %}
+                {% load static %}
+                <img class="follower_article_image alpha30" src="{% static 'users/images/no-image.png' %}" alt="">
+              {% endfor %}
+            </a>
+          </div>
+          <!-- フォローワーのユーザー情報 //-->
+          <div class="user_box2">
+            <a href="{% url 'users:profile_show' followers_article.user.username %}">
+              {% if followers_article.user.person.image.url %}
+                <img class="user_image" src="{{ followers_article.user.person.image.url }}" alt="">
+              {% else %}
+                {% load static %}
+                <img class="user_image" src="{% static 'users/images/no_image_face.png' %}" alt="">
+              {% endif %}
+            </a>
+            <a href="{% url 'users:profile_show' followers_article.user.username %}">
+              <span class="name">{{ followers_article.user.username }}</span>
+            </a><br>
+            <span class="date">{{ followers_article.posted_date }}</span>
+          </div>
+        {% else %}
+          <p class="center mt150">記事がありません</p>
+        {% endif %}
+      </div>
+
+      <!-- アクセス情報 //-->
+      <div class="my_page_box_type2 ml1p">
+        <p class="box_page_title">合計リアクション数</p>
+        <p class="link_to_list"><a href="#">詳細を見る</a></p>
+        <p class="mt30 mb0">閲覧数</p>
+        <p class="fts20 bold mt10">{{ pv }}</p>
+        <p>いいね！</p>
+        <p class="fts20 bold">{{ good_cnt }}</p>
+        <p>ブックマーク</p>
+        <p class="fts20 bold">{{ bm_cnt }}</p>
+        <p>コメント</p>
+        <p class="fts20 bold">{{ comment_cnt }}</p>
+      </div>
+
+      <!-- プロフィール情報 //-->
+      <div class="my_page_box_type2 ml1p">
+        <p class="box_page_title">プロフィール</p>
+        <p class="link_to_list"><a href="{% url 'users:profile_show' username %}">すべて見る</a></p>
+        {% if profile %}
+          <div class="chart_box">
+            <span id="invibible_box_for_get_ability_power" class="invisible">{{ profile.ability_power }}</span>
+            <span id="invibible_box_for_get_ability_speed" class="invisible">{{ profile.ability_speed }}</span>
+            <span id="invibible_box_for_get_ability_magic" class="invisible">{{ profile.ability_magic }}</span>
+            <span id="invibible_box_for_get_ability_brain" class="invisible">{{ profile.ability_brain }}</span>
+            <span id="invibible_box_for_get_ability_gard" class="invisible">{{ profile.ability_gard }}</span>
+            <span id="invibible_box_for_get_ability_magicgard" class="invisible">{{ profile.ability_magicgard }}</span>
+            <canvas id="radar_chart_of_my_page" width="100" height="100"></canvas>
+          </div>
+        {% else %}
+          <p class="center mt100">プロフィールが登録されていません</p>
+          <p class="center mt50"><a class="button_link_to_anything2" href="{% url 'users:profile_form' %}">+ プロフィール登録</a></p>
+        {% endif %}
+
+
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+{% endblock content %}
+

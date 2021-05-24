@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+    <script type="text/javascript" src="{% static 'users/js/motion.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/preview.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/preview2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/choice_is_best.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/show_more.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/good.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/random_color_assignment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/radar_chart.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/slider.js' %}"></script>
+    <script type="text/javascript" src="{% static 'users/js/add_tag.js' %}"></script>
+
+    <title></title>
+  </head>
+
+  <body>
+    <head>
+      <div class="header">
+        <!-- ロゴ //-->
+        <p class="logo"><a href="{% url 'users:index' %}">Let's Talk <span class="small">as a</span> Character</a></p>
+        <!-- 検索窓 //-->
+        {% if request.session.username %}
+        <div class="head_search_box">
+          <form class="search_form" action="{% url 'users:article_search' %}" method="post">
+            <input class="search_input_text" type="text" name="search_text" value="" placeholder="記事を検索">
+            {% csrf_token %}
+            <input class="search_input_submit" type="image" src="{% static 'users/images/search_icon.png' %}" name="" value="検索">
+          </form>
+        </div>
+        {% endif %}
+        <!-- ユーザー情報 //-->
+        {% if request.session.username %}
+          <div class="login_info_box">
+            <div class="login_user_info_box">
+              <a href="{% url 'users:my_page' %}">
+                {% if request.session.userimage %}
+                  <img class="login_user_image" src="{{ request.session.userimage }}" alt="">
+                {% else %}
+                  {% load static %}
+                  <img class="login_user_image" src="{% static 'users/images/no_image_face.png' %}" alt="">
+                {% endif %}
+              </a>
+              <p class="username">{{ request.session.username|truncatechars:7 }}でログイン中。 </p>
+              <p class="is_logout"><a href="{% url 'users:logout' %}">ログアウト</a></p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </head>
+
+
+
+    {% block content %}
+    {% endblock content %}
+
+    <div id="footer">
+      <p class="center mt0">Copyright c SeaBorn 2021</p>
+    </div>
+
+    <script>
+        lazyload();
+    </script>
+  </body>
+</html>

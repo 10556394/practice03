@@ -1,0 +1,94 @@
+<!-- 仕組み MEMO
+１，セレクトボックスは機能そのまま。ただし見えなくする
+２，画像を選んだら、同じセレクトoptionが選ばれるようにする
+３，後は、いつも通りPOST
+
+最初、絶対に無理だろうって思っていたけれど、結局完成！
+やはり、自分にできないことはない。2021.5.7
+//-->
+
+<p class="fts20">▼ タグ画像を選んでください <small>（必須） </small> </p>
+<div class="candidate_tag_image_bigbox">
+  {% for group_name, group_choices, group_index in widget.optgroups %}
+    {% if forloop.first %}
+      {% for option in group_choices %}
+      <div class="candidate_tag_image_box first_box">
+        <p>
+          <a href="javascript:void(0)">
+            <img class="candidate_tag_image" id="candidate_tag_image{{ forloop.parentloop.counter }}" src="{{ option.label }}" alt="">
+          </a>
+          <input class="candidate_tag_checkbox" id="candidate_tag_checkbox{{ forloop.parentloop.counter }}" type="checkbox" name="candidate_tag_checkbox" value="{{ option.value }}">
+        </p>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for option in group_choices %}
+      <div class="candidate_tag_image_box">
+        <p>
+          <a href="javascript:void(0)">
+            <img class="candidate_tag_image" id="candidate_tag_image{{ forloop.parentloop.counter }}" src="{{ option.label }}" alt="">
+          </a>
+          <input class="candidate_tag_checkbox" id="candidate_tag_checkbox{{ forloop.parentloop.counter }}" type="checkbox" name="candidate_tag_checkbox" value="{{ option.value }}">
+        </p>
+      </div>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+</div>
+
+<select class="select_tag_image_in_dandidates" id="select_tag_image_in_candidates" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+  {% for group_name, group_choices, group_index in widget.optgroups %}
+    {% if group_name %}
+      <optgroup label="{{ group_name }}">
+    {% endif %}
+    {% for option in group_choices %}
+      {% include option.template_name with widget=option %} <br>
+    {% endfor %}
+    {% if group_name %}
+  </optgroup> <br>
+    {% endif %}
+  {% endfor %}
+</select>
+
+<script type="text/javascript">
+  window.onload = function(){
+    var roop_cnt = document.getElementsByClassName('candidate_tag_image_box').length
+    var select = document.getElementById('select_tag_image_in_candidates')
+    var s_button = document.getElementById('candidate_tag_image_submit_button')
+    var is_selected = false
+
+    /* 選択された画像に対応したセレクト optionを選択する */
+    for (let i=1; i<=roop_cnt; i++){
+      document.getElementById('candidate_tag_image' + i).addEventListener('click', function(){
+        if (document.getElementById('candidate_tag_checkbox' + i).checked == true){
+          document.getElementById('candidate_tag_checkbox' + i).checked = false
+          document.getElementById('candidate_tag_image' + i).style.border = 'none'
+          select.options[i-1].selected = true
+
+        } else {
+          for (let n=1; n<=roop_cnt; n++){
+            document.getElementById('candidate_tag_checkbox' + n).checked = false
+            document.getElementById('candidate_tag_image' + n).style.border = 'none'
+            select.options[n-1].selected = false
+          }
+          document.getElementById('candidate_tag_checkbox' + i).checked = true
+          document.getElementById('candidate_tag_image' + i).style.border = '5px #FFB74B solid'
+          select.options[i-1].selected = true
+        }
+      })
+    }
+
+    /* 画像が選択されていなかったときのアラート表示。本来は Djangoがメッセージを出すが、hiddenしているので Jsで処理した */
+    s_button.addEventListener('click', function(){
+      for (let i=1; i<=roop_cnt; i++){
+        if (document.getElementById('candidate_tag_checkbox' + i).checked == true){
+          is_selected = true
+        }
+      }
+      if (is_selected == false){
+        alert('画像を選択してください。')
+      }
+    })
+  }
+
+</script>

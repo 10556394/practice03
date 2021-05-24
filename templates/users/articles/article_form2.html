@@ -1,0 +1,49 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">記事を投稿</p>
+      <div id="article">
+
+        {% if message %}
+          <p class="center mb50">{{ message }}</p>
+        {% endif %}
+
+        <form name="article_form2" class="" action="{% url 'users:article_regist2' %}" method="post" enctype="multipart/form-data">
+          {% for form in forms %}
+            {{ form.label }}<br>
+            {{ form }}<br>
+            {% if form.errors %}
+              {{ form.errors }}<br>
+            {% endif %}
+          {% endfor %}
+
+          {% for photo_form in photo_forms %}
+            <div class="photo_article_form2">
+              {% load static %}
+              <img id="image_as_article_form2_{{ forloop.counter }}" class="image_as_article_form2 alpha40" src="{% static 'users/images/plus.png' %}" alt="">
+                {{ photo_form }}
+            </div>
+          {% endfor %}
+
+          {{ photo_forms.management_form }}
+
+          <div class="add_tag_box">
+            <input id="id_tag" type="text" name="" value="" placeholder="タグ：10個まで 追加ボタンでセット" maxlength="30" >
+            <button class="add_button" id="add_tag_button" type="button" name="button">追加</button>
+            <div id="show_add_tags_area"></div>
+          </div>
+
+          <hr class="hidden_hr mb50">
+          {% csrf_token %}
+          <input class="clear_both" type="submit" name="" value="投稿">
+        </form>
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content%}

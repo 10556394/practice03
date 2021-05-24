@@ -1,0 +1,116 @@
+{% extends 'users/base.html' %}
+{% block content %}
+{% include 'users/articles/menu.html' %}
+<div id="content">
+  {% include 'users/articles/left.html' %}
+  <div id="main">
+    <p class="page_title">TODO</p>
+    <div id='profile'>
+      <a href="#" onClick=openClose()>目標：やりたいこと、思ったことが自由に実現できるレベルになる。[start 2021.3.24] </a> <br><br>
+      <div class="openBox">
+        <span>
+          2021.5.20 ローカルでのアプリ完成。 <br>
+          次のTODO デプロイの方法を調べ、アプリ公開。<br>
+        </span><br>
+        <span>--------------------------</span><br>
+        <span>□ adminにログインした情報が、usersにも残ってしまう。</span> <br>
+        <span class="end">□ 登録しているユーザーの一覧画面作成</span><br>
+        <br>
+
+        <span class="end">□ トップページ</span><br>
+        <span class="end">　└ ページネーション（もっと見る）</span><br>
+        <span class="end">　└ lazyload設置</span><br>
+        <span class="end">　└ Indexページのメッセージが、ずっと表示されてしまう</span><br>
+        <span class="end">　└ 記事の並び順：アクセスの多い順。ブックマークの多い順。最新順。これらをうまく合わせていい感じにランダム表示したい。</span>
+        <br>
+
+        <span class="end">□ マイページ</span><br>
+        <span class="end">　└ 記事の投稿フォームを作る。</span><br>
+        <span class="end">　└ プロフィールの登録・編集フォームを作る。</span><br>
+        <span class="end">　└ パスワードの変更リンクつける</span><br>
+        <span class="end">　└ ページの中身：アクセス解析。投稿数やフォロー数のサマリ。</span><br>
+        <span class="suspension">　└ そのほか、練習になる機能をじゃんじゃか追加する。</span><br><br>
+
+        <span class="end">□ プロフィール</span><br>
+        <span class="end">　└ Crud</span><br>
+        <span class="end">　└ 画像プレビューつける</span><br>
+        <span class="end">　└ 削除ボタンつける</span><br>
+        <span class="end">　└ フォローできるようにする</span><br>
+        <span class="end">　└ Abilityバリデートつける：未解決の難問 [2021.4.4]（ バリデートがうまくいかない。そもそもMaxValueValidator[10]が効いているのか疑問 ）</span><br>
+        <span class="end">　└ パートナーがOneToOneでつながっているため、選択済みuserを選ぶとエラーが出てしまう。</span> <br>
+        <span class="end">　└ 下に、そのユーザーが書いた記事を表示。</span><br>
+        <span class="end">　└ スキルマップを、レーダーチャートで表現したい。</span><br>
+        <span class="end">　└ Ability選択バー設置</span><br>
+        <br>
+
+        <span class="end">□ 記事</span><br>
+        <span class="end">　└ CRUD</span><br>
+        <span class="end">　└ コメントや記事が書けるようにする。記事は写真つきで。</span><br>
+        <span class="end">　└ コメントの送信を非同期で行う。</span><br>
+        <span class="end">　└ コメントの返信や削除も非同期通信で行う。</span>
+        <span class="end">　└ 一つの記事につき、写真は何枚でも投稿できる。</span><br>
+        <span class="end">　└ 写真を１枚１枚選べる形にする。</span><br>
+        <span class="end">　└ 写真登録、＋ボタンおしゃれなやつにも挑戦</span><br>
+        <span class="end">　└ コメントに返信できるようにする</span><br>
+        <span class="end">　└ 投稿日をつける</span><br>
+        <span class="end">　└ 書いた記事は、トップページに一覧表示する。</span><br>
+        <span class="end">　└ お気に入り登録ボタンをつける</span><br>
+        <span class="end">　└ タグ機能追加</span><br>
+        <span class="end">　　└ タグの削除</span><br>
+        <span class="end">　　└ 1記事につき、10個までのバリデート</span><br>
+        <span class="end">　　└ タグで検索</span><br>
+        <span class="end">　　└ タグの詳細表示。写真：記事から。</span><br>
+        <span class="end">　　└ 写真：最もお気に入りされている画像を、main_photoに選ぶ</span>
+        <span class="end">　　└ タグの詳細登録機能作成</span><br>
+        <span class="end">　　└ 人気タグを作成。アクセス順。つまり、アクセスカウントの箱作る。</span><br>
+        <span class="suspension">　　└ おススメタグ作成。スタッフが操作できるようにする</span><br>
+        <span class="end">　└ 代表写真が選べるようにする。</span><br>
+        <span class="end">　└ 写真登録の場所違い処理</span><br>
+        <span class="end">　└ 編集一覧画面に、コメント数を掲載する</span><br>
+        <span class="suspension">　└ ブログのように、画像を自由に設置できるようにする ⇒ 3rdFaseへ</span><br>
+        <span class="suspension">　└ ブログのように、絵文字やフォントを自由に変えられるようにする。 ⇒ 3rdFaseへ</span><br>
+        <span class="suspension">　└ 写真登録、ドラッグアンドドロップに挑戦してみる？ ⇒ 3rdFaseへ</span><br>
+        <span class="end">　└ いいね機能をつける</span><br>
+        <span class="end">　└ 閲覧数をつける</span><br>
+        <span class="end">　└ 関連する記事を下に表示する</span><br>
+        <span class="end">　└ タグが最初につけられるようにする</span><br>
+        <br>
+
+        <span class="end">□ お気に入りページ</span><br>
+        <span class="end">　└ 一覧表示・お気に入り解除</span><br>
+        <span class="end">　└ lazyload設置</span><br><br>
+
+        <span class="end">□ アルバム</span><br>
+        <span class="end">　└ Crud</span><br>
+        <span class="end">　└ 記事の写真をお気に入り登録（ハート）でき、その写真を一覧表示する。</span><br>
+        <span class="end">　└ 追加しました！ってアクションつける。</span><br>
+        <span class="end">　└ 写真から、記事とプロフィールへ飛べるようにする</span><br>
+        <span class="suspension">　└ 画像の並び順に、自分の趣向を反映させる。機械が好みを判別する。⇒ 機械学習のため、3rdFaseへ持ち越し</span><br><br>
+
+        <span class="end">□ デザインも、世の中に出して恥ずかしくないレベルにまでブラッシュアップする。</span><br>
+        <span class="end">　└ その際、できる限り使いまわしの効く、ライブラリなどを利用すること。</span><br>
+        <span class="end">　└ ページの下へ行くほど、画像を読み込む機能を作る。</span><br>
+        <span class="suspension">　└ ユーザー一覧ページの写真に、カラフルなボーダーをつける。ランダムでカラー自動生成。</span><br>
+        <span class="suspension">　└ レスポンシブデザインにする。⇒ デプロイを早めたいため、3rdFaseへ持ち越し</span><br><br>
+
+        <span>□ 写真と閲覧に、R-18をつける</span><br>
+        <span>□ 記事を、ツイッターやFacebookでシェアできるようにする</span><br>
+        <span>□ 広告を出す</span><br>
+        <span>　└ 広告の管理画面を作る。登録やアクセス解析まで。</span><br>
+        <span>□ プレミアム会員を作る</span><br>
+        <span>　└ 決済機能（仮）を作り、支払いが完了したらプレミアム会員</span><br>
+        <span>　└ プレミアム得点は、プレミアム画像が閲覧できる。広告が非表示になる。</span><br>
+        <span>□ そのほか、使っていて少しでも不便に感じたことは、すべて思った通りに改善する。</span><br><br>
+
+        <span>□ デプロイ</span><br>
+        <span>　└ MySQLに切り替える</span><br>
+        <span>　└ 会員登録の際、本当にメールを送る</span><br>
+        <span>　└ デバッグ </span><br>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock content %}

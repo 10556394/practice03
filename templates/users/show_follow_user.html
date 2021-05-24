@@ -1,0 +1,56 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">{{ title1 }}</p>
+      <div id="profile">
+
+        <!-- 自身がフォローしているユーザー //-->
+        {% if users %}
+          {% for user in users %}
+            <div class="show_all_user_box">
+              <a href="{% url 'users:profile_show' user.username %}">
+                {% if user.person.image.url %}
+                  <img src="{{ user.person.image.url }}" alt="">
+                {% else %}
+                  {% load static %}
+                  <img src="{% static 'users/images/no_image_face.png' %}" alt="">
+                {% endif %}
+              </a>
+              <p>{{ user.username }}</p>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="center mt40 mb50">フォローしているユーザーはいません。</p>
+        {% endif %}
+
+        <!-- 自身をフォローしているユーザー //-->
+        <div class="follower_box">
+          <p class="f_title">{{ title2 }}</p>
+          {% if followers %}
+            {% for follower in followers %}
+              <div class="follower_info_box">
+                <a href="{% url 'users:profile_show' follower.username %}">
+                  {% if follower.person.image.url %}
+                    <img src="{{ follower.person.image.url }}" alt="">
+                  {% else %}
+                    {% load static %}
+                    <img src="{% static 'users/images/no_image_face.png' %}" alt="">
+                  {% endif %}
+                </a>
+                <p>{{ follower.username }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="center mt40 mb50">あなたをフォローしているユーザーは、いません。</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,38 @@
+
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/my_left.html' %}
+    <div id="main">
+      <p class="page_title">記事を投稿</p>
+      <div id="article">
+
+        {% if message %}
+          <p class="center mb50">{{ message }}</p>
+        {% endif %}
+
+        <form name="article_form2" class="" action="{% url 'users:article_regist_with_tags_test' %}" method="post" enctype="multipart/form-data">
+
+          <input id="id_tag" type="text" name="" value="">
+
+          <button id="add_tag_button" type="button" name="button">追加</button>
+          <div id="show_add_tags_area"></div>
+
+          {% if tags %}
+            {% for tag in tags %}
+              {{ tag }}
+            {% endfor %}
+          {% endif %}
+
+          {% csrf_token %}
+          <input type="submit" name="" value="送信">
+        </form>
+
+      </div>
+    </div>
+    <div id="right"></div>
+  </div>
+
+{% endblock content%}

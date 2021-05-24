@@ -1,0 +1,324 @@
+
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+  <div id="content">
+    {% include 'users/articles/left.html' %}
+    <div id="main">
+      <p class="page_title">{{ article.title }}</p>
+
+      {% if message %}
+        <p class="message_style2 fadeout2">{{ message }}</p>
+      {% endif %}
+
+      <!-- 非同期通信用の、article_id セット //-->
+      <span id="for_article_regist_asynchronous" class="invisible">{{ article.id }}</span>
+
+      <!-- アクセスカウント用のスクリプト //-->
+      {% load static %}
+      <script type="text/javascript" src="{% static 'users/js/visit_count.js' %}"></script>
+
+      <!-- 記事を書いたユーザー情報  //-->
+      <div class="user_box author_box">
+        <a href="{% url 'users:profile_show' author.username %}">
+          {% if author_profile.image.url %}
+            <img class="user_image"src="{{ author_profile.image.url }}" alt="">
+          {% else %}
+            {% load static %}
+            <img class="user_image" src="{% static 'users/images/no_image_face.png' %}" alt="">
+          {% endif %}
+        </a>
+        <span class="name">{{ author.username }}</span>
+        <span class="date">{{ article.posted_date }}</span>
+      </div>
+
+      <!-- 記事 //-->
+      <div id="article" class="article_show">
+        <p>{{ article.body | linebreaksbr }}</p>
+        {% for photo in photos %}
+          <div class="article_photo_box">
+            <a href="{{ photo.image.url }}"><img class="main lazyload" data-src="{{ photo.image.url }}" alt=""></a>
+            <!-- アルバム追加済みなら、赤ハート //-->
+            {% for album in albums %}
+              {% if album.photo.id == photo.id %}
+                <a id="link_to_album_show{{ forloop.parentloop.counter }}" href="{% url 'users:album_show' %}"><img class="love" src="{% static 'users/images/love_red.png' %}" alt=""></a>
+              {% endif %}
+            {% endfor %}
+
+            <!-- まだアルバムに登録していなければ、青ハート：非同期かどうかで、アルバム追加の処理を切り替える //-->
+            {% if is_XHR %}
+              <span id="invisible_tag_for_get_photo_id{{ forloop.counter }}" class="invisible">{{ photo.id }}</span>
+              <a id="link_to_album_regist{{ forloop.counter }}" href="javascript:void(0)">
+                <img class="love" src="{% static 'users/images/love_blue.png' %}" alt="">
+              </a>
+            {% else %}
+              <a id="link_to_album_regist{{ forloop.counter }}" href="{% url 'users:album_regist' photo.id article.id %}">
+                <img class="love" src="{% static 'users/images/love_blue.png' %}" alt="">
+              </a>
+            {% endif %}
+            <!-- 非同期でアルバム追加完了したときは、この赤ハートを強制表示 //-->
+            <a id="layzy_love_red{{ forloop.counter }}" class="invisible" href="{% url 'users:album_show' %}" ><img class="love" src="{% static 'users/images/love_red.png' %}" alt=""></a>
+            <p id="layzy_love_commit_message{{ forloop.counter }}" class="album_regist_commit_message invisible">ALBUM<br><span class="fts40">IN!</span></p>
+          </div>
+        {% endfor %}
+
+        <!-- タグ：削除ボタンは - をクリックで表示 //-->
+        <form class="black_form2"  action="{% url 'users:tag_delete' article.id %}" method="post">
+          <ul class="article_tags">
+            {% for tag in tags %}
+              <li class='tag'>
+                <input id="checkbox_for_tag_delete{{ forloop.counter }}" type="checkbox" name="tag_del" value="{{ tag.id }}" class="invisible">
+                <span id="sharp_as_tag_landmark{{ forloop.counter }}" class="normal_design"># </span>
+                <a href="{% url 'users:tag_search' tag %}">{{ tag }}</a>
+              </li>
+            {% endfor %}
+            {% if tags %}
+              <li><a id="open_tag_regits_form" href="javascript:void(0)" class="bold">＋</a></li>
+              <li><a id="show_delete_checkbox" href="javascript:void(0)" class="bold ml10">-</a></li>
+            {% else %}
+              <li><a id="open_tag_regits_form"  href="javascript:void(0)" class="bold">＋タグを追加する</a></li>
+            {% endif %}
+          </ul>
+          {% csrf_token %}
+          <input id="submit_button_to_tag_delete" class="invisible mb50" type="submit" name="" value="タグを削除">
+        </form>
+
+        <!-- タグ追加フォーム //-->
+        <form id="opened_tag_regist_form" class="black_form" action="{% url 'users:tag_regist' article.id %}" method="post">
+          {% for form in tag_forms %}
+            {{ form }}
+          {% endfor %}
+          {% csrf_token %}
+          <input type="submit" name="" value="追加">
+        </form>
+
+
+        <div class="article_love_box">
+          <!-- いいね機能：デフォルトは Djangoから取得したデータで処理 //-->
+          {% if good %}
+            <!-- いいね解除 //-->
+            <a id="button_to_release_good_asynchronosuly" href="javascript:void(0)">
+              <img class="good" src="{% static 'users/images/good_red.png' %}" alt="">
+            </a>
+          {% else %}
+            <!-- いいね登録 //-->
+            <a id="button_to_regit_good_asynchronously" href="javascript:void(0)">
+              <img class="good" src="{% static 'users/images/good_blue.png' %}" alt="">
+            </a>
+          {% endif %}
+          <!-- いいね解除2 //-->
+          <a id="button_to_release_good_asynchronosuly2" href="javascript:void(0)"><img class="good invisible" src="{% static 'users/images/good_red.png' %}" alt=""></a>
+          <!-- いいね登録2 //-->
+          <a id="button_to_regit_good_asynchronously2" href="javascript:void(0)"><img class="good invisible" src="{% static 'users/images/good_blue.png' %}" alt=""></a>
+          <span id="display_location_as_good_count">{{ good_cnt }}</span>
+
+          &nbsp;
+          <!-- お気に入り //-->
+          {% if bookmark %}
+            <a href="{% url 'users:bookmark_show' %}"><img class="love" src="{% static 'users/images/love_red.png' %}" alt=""></a>
+          {% else %}
+            <a id="link_to_bookmark_on_as_xhr" href="javascript:void(0)"><img class="love" src="{% static 'users/images/love_blue.png' %}" alt=""></a>
+          {% endif %}
+          <!-- お気に入りに登録したら、このボタンを表示 //-->
+          <a id="bookmark_button_after_click_bookmark" class="invisible" href="{% url 'users:bookmark_show' %}">
+            <img class="love" src="{% static 'users/images/love_red.png' %}" alt="">
+          </a>
+          <!-- 訪問者数 //-->
+          <img class="visit" src="{% static 'users/images/visit.png' %}" alt=""><span id="visit_cnt_show_box">{{ visit_cnt }}</span>
+
+          <!-- お気に入りに登録しました、のメッセージ //-->
+          <div id="message_as_bookmark_complete" class="message_as_bookmark_complete">お気に入りに登録しました</div>
+        </div>
+
+
+        <!-- コメント //-->
+        <div class="comment_box">
+          <!-- XHRの設定がTrueなら、javascriptの非同期通信でコメント処理する //-->
+          {% if is_XHR %}
+            <form class="article_show_form" id="comment">
+              <input id="article_id_for_xhr" class="article_id_for_xhr" type="text" name="" value="{{ article.id }}">
+          {% else %}
+            <form class="comment_form article_show_form" action="{% url 'users:comment_regist' article.id %}" method="post">
+          {% endif %}
+
+            <!-- コメント入力フォーム //-->
+            {% for form in forms %}
+              {{ form }}
+            {% endfor %}
+
+            {% csrf_token %}
+            <!-- XHRの設定がTrueなら、javascriptの非同期通信でコメント処理する //-->
+            {% if is_XHR %}
+              <input id="comment_send_button" class="comment_send_button" type="button" value="送信">
+            {% else %}
+              <input class="comment_send_button" type="submit" name="" value="送信">
+            {% endif %}
+          </form>
+
+          <!-- 非同期にて登録したコメント：デフォルトはhidden //-->
+          <div id="comment_xhr_response" class="comment_text_box asynchronous_reply_box">
+            <a id="comment_xhr_response_a" href="">
+              <img id="comment_xhr_response_img" src="" alt="">
+            </a>
+            <p class="you">あなた</p>
+            <p id="comment_xhr_response_name" class="name"></p>
+            <p id="comment_xhr_response_date" class="date"></p>
+            <p class="comment_xhr_response_as">
+              <a id="comment_xhr_response_a_res" href="javascript:void(0)" class="invisible">返信</a>
+              {% if is_XHR %}
+                <a id="comment_xhr_response_a_del_with_xhr" href="javascript:void(0)">削除</a>
+                <a id="comment_xhr_response_a_del" href="" class="invisible" ></a>
+              {% else %}
+                ・<a id="comment_xhr_response_a_del" href="">削除</a>
+              {% endif %}
+            </p>
+            <p id="comment_xhr_response_body" class="body"></p>
+          </div>
+          {{ form.error }}
+
+          <!-- 通常のコメント一覧 //-->
+          {% for comment in comments %}
+            <div class="comment_text_box" id="comment_text_box{{ forloop.counter }}">
+              <span id="invisible_tag_for_get_comment_id{{ forloop.counter }}" class="invisible">{{ comment.id }}</span>
+              <a href="{% url 'users:profile_show' comment.user.username %}">
+                {% if comment.user.person.image.url %}
+                  <img src="{{ comment.user.person.image.url }}" alt="">
+                {% else %}
+                  <img src="{% static 'users/images/no_image_face.png' %}" alt="">
+                {% endif %}
+              </a>
+              {% if comment.user.username == username %}
+                <p class="you">あなた</p>
+              {% endif %}
+              <p class="name">{{ comment.user.username }}</p>
+              <p class="date">
+                {{ comment.posted_date }}
+                &nbsp;&nbsp;
+                <a id="open_reply_form{{ forloop.counter }}" href="javascript:void(0)">返信</a>
+                {% if comment.user.username == username %}
+                  {% if is_XHR %}
+                    ・ <a id="comment_asynchronous_delete{{ forloop.counter }}" href="javascript:void(0)" >削除</a>
+                  {% else %}
+                    ・ <a href="{% url 'users:comment_delete' comment.id %}">削除</a>
+                  {% endif %}
+                {% endif %}
+              </p>
+              <p class="body">{{ comment.body }}</p>
+
+              <!-- 返信フォーム //-->
+              <div id="reply_box{{ forloop.counter }}" class="reply_box">
+                {% if is_XHR %}
+                  <form id="reply_asynchronous_form{{ forloop.counter }}" class="">
+                    <span id="invisible_tag_for_get_article_id" class="invisible">{{ article.id }}</span>
+                {% else %}
+                  <form class="" action="{% url 'users:reply_regist' comment.id article.id %}" method="post">
+                {% endif %}
+
+                  {% for reply_form in reply_forms %}
+                    {{ reply_form }}
+                  {% endfor %}
+
+                  {% csrf_token %}
+                  {% if is_XHR %}
+                    <input id="reply_asynchronous_regist_button{{ forloop.counter }}" type="button" name="" value="送信">
+                  {% else %}
+                    <input type="submit" value="送信">
+                  {% endif %}
+                </form>
+              </div>
+
+              <!-- 返信コメント表示：非同期 //-->
+              <div id="reply_xhr_response_box{{ comment.id }}" class="reply_show_box reply_show_box_as_asynchronous">
+                <a id="reply_xhr_response_a" href=""><img id="reply_xhr_response_img{{ comment.id }}" src="" alt=""></a>
+                <p class="you">あなた</p>
+                <p id="reply_xhr_response_name{{ comment.id }}" class="name"></p>
+                <p id="reply_xhr_response_date{{ comment.id }}" class="date"></p>
+                <p class="reply_xhr_response_as">
+                  {% if is_XHR %}
+                    <!-- ページ遷移を無効にするためのボタン //-->
+                    <a id="reply_xhr_response_a_del_with_xhr{{ forloop.counter }}" href="javascript:void(0)">削除</a>
+                    <!-- 本来やりたい動作をさせるためのボタン hrefは View から返ってくる //-->
+                    <a id="reply_xhr_response_a_del{{ comment.id }}" href="" class="invisible"></a>
+                  {% else %}
+                    <a id="reply_xhr_response_a_del{{ comment.id }}" href="" >削除</a>
+                  {% endif %}
+                </p>
+                <p id="reply_xhr_response_body{{ comment.id }}" class="body"></p>
+              </div>
+
+              <!-- 返信コメント一覧 //-->
+              {% for reply in replys %}
+                {% if reply.comment.id == comment.id %}
+                  <div id="reply_show_box{{ forloop.counter }}" class="reply_show_box">
+                    <a href="{% url 'users:profile_show' reply.user.username %}"><img src="{{ reply.user.person.image.url }}" alt=""></a>
+                    {% if reply.user.username == username %}
+                      <p class="you">あなた</p>
+                    {% endif %}
+                    <p class="name">{{ reply.user.username }}</p>
+                    <p class="date">
+                      {{ reply.posted_date }}
+                      {% if reply.user.username == username %}
+                        {% if is_XHR %}
+                          <a id="reply_asynchronous_delete{{ forloop.counter }}" href="javascript:void(0)" class="ml10">削除</a>
+                          <span id="invisible_tag_for_get_reply_id{{ forloop.counter }}" class="invisible">{{ reply.id }}</span>
+                        {% else %}
+                          <a href="{% url 'users:reply_delete' reply.id article.id %}" class="ml10">削除</a>
+                        {% endif %}
+                      {% endif %}
+                    </p>
+                    <p class="body">{{ reply.body }}</p>
+                  </div>
+                {% endif %}
+              {% endfor %}
+
+            </div>
+          {% endfor %}
+          <!-- ↑ここまでが、コメント１セット //-->
+        </div>
+        <!-- ↑ここまでが、コメントボックス //-->
+      </div>
+      <!-- ↑ここまでが id=article //-->
+
+      <!-- 関連記事 //-->
+      <div class="related_article_box">
+        <p class="r_title">関連記事</p>
+        {% for r_art in related_articles %}
+          <div class="r_art_box">
+            <a href="{% url 'users:article_show' r_art.id %}">
+              {% load my_templatetags %}
+              {% set is_selected = False %}
+              {% for photo in r_art.art_image.all %}
+                {% if photo.is_best %}
+                  <img class="r_art_img" src="{{ photo.image.url }}" alt="">
+                  {% set is_selected = True %}
+                {% endif %}
+                {% if forloop.last %}
+                  {% if not is_selected %}
+                    {% for p in r_art.art_image.all|slice:1 %}
+                      <img class="r_art_img" src="{{ p.image.url }}" alt="">
+                    {% endfor %}
+                  {% endif %}
+                {% endif %}
+              {% empty %}
+                {% load static %}
+                <img class="r_art_img alpha30" src="{% static 'users/images/no-image.png' %}" alt="">
+              {% endfor %}
+              <p class="r_art_title">{{ r_art.title|truncatechars:20 }}</p>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- ↑関連記事：ここまで //-->
+
+    </div>
+    <!-- ↑ここまでが main //-->
+    <div id="right"></div>
+  </div>
+
+  {% load static %}
+  <script type="text/javascript" src="{% static 'users/js/xhr.js' %}"></script>
+  <script type="text/javascript" src="{% static 'users/js/album.js' %}"></script>
+  <script type="text/javascript" src="{% static 'users/js/tag.js' %}"></script>
+
+{% endblock content %}

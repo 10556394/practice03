@@ -1,0 +1,186 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+  {% include 'users/articles/menu.html' %}
+
+  <!-- 初回訪問時は、ようこそ //-->
+  {% if message %}
+    <p class="center mt50 mb20 fts30">{{ message }}</p>
+  {% endif %}
+
+  <!-- トップページを訪問した場合、人気タグの一覧を表示 //-->
+  {% if pop_tags %}
+    <div id="where_to_write_style_dynamically" class=""></div>
+    <div class="populer_tags_box">
+      <span id="index_slider_left" class="arrow left"></span>
+      <div class="">
+        {% for p_tag in pop_tags|slice:30 %}
+          <a id="populer_tag_a{{ forloop.counter }}" class="populer_tag" href="{% url 'users:tag_search' p_tag %}"># {{ p_tag }}</a>
+        {% endfor %}
+      </div>
+      <span id="index_slider_right" class="arrow right"></span>
+    </div>
+  {% endif %}
+
+  <!--タグや検索から訪問した場合は、タグヘッダーを表示する //-->
+  {% if tag %}
+  <div id="tag_header">
+    {% load static %}
+    {% if main_photo %}
+      <img class="main_photo" src="{{ main_photo.image.url }}" alt="">
+    {% else %}
+      <img class="main_photo alpha50" src="{% static 'users/images/no-image.png' %}" alt="">
+    {% endif %}
+    <div class="tag_head_content">
+      {% if is_editable %}
+        <p class="tag_title"><a href="{% url 'users:tag_detail_regist_form' tag %}"># {{ tag }}</a></p>
+      {% else %}
+        <p class="tag_title"># {{ tag }}</p>
+      {% endif %}
+
+      {% if tag_detail %}
+        <p class="tag_detail wid50p">{{ tag_detail.detail }}</p>
+      {% else %}
+        <p class="tag_detail">タグの説明は、登録されていません</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- コンテンツ //-->
+  <div id="content">
+    {% include 'users/articles/left.html' %}
+    <div id="main">
+      {% if tag %}
+        <h2 class="ml30 mt30">「{{ tag }}」に関連する記事</h2>
+      {% endif %}
+      <!-- 記事を表示 //-->
+      {% for art in articles %}
+        <div id="art_box{{ forloop.counter }}" class="art_box">
+          <!-- 画像表示パターン１：( view画像選出：パターン３　)とりあえず１枚目を表示。登録がなければNo-imageを表示
+          <a href="{% url 'users:article_show' art.id %}">
+            {% if art.art_image.all %}
+              {% for art_image in art.art_image.all|slice:':1' %}
+                <img  class="art_photo" src="{{ art_image.image.url }}" alt="">
+              {% endfor %}
+            {% else %}
+              {% load static %}
+              <img class="art_photo no-image" src="{% static 'users/images/no-image.png' %}" alt="">
+            {% endif %}
+          </a>
+          //-->
+
+          <!-- 画像表示パターン２：is_bestを優先的に選ぶ //-->
+          <a href="{% url 'users:article_show' art.id %}">
+            {% load my_templatetags %}
+            {% set selected_photo = False %}
+
+            {% for photo in photos %}
+              {% if art.id == photo.article.id %}
+                <img class="art_photo lazyload" data-src="{{ photo.image.url }}" alt="">
+                {% set selected_photo = True %}
+              {% endif %}
+
+              {% if forloop.last %}
+                {% if not selected_photo %}
+                  {% load static %}
+                  <img class="art_photo no-image" src="{% static 'users/images/no-image.png' %}" alt="">
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </a>
+
+          <!-- お気に入り登録用コンテンツ //-->
+          <p class="love_box">
+            <!-- お気に入り登録済みの場合は赤ハート//-->
+            {% for bookmark in bookmarks %}
+              {% if bookmark.article.id == art.id %}
+                <a id="is_bookmarked{{ forloop.parentloop.counter }}" href="{% url 'users:bookmark_show' %}"><img src="{% static 'users/images/love_red.png' %}" alt=""></a>
+              {% endif %}
+            {% endfor %}
+            <!-- お気に入り未登録の場合の青ハート//-->
+            {% if is_XHR %}
+              <span id="invisible_tag_for_get_article_id{{ forloop.counter }}" class="invisible">{{ art.id }}</span>
+              <span id="invisible_tag_for_get_is_XHR" class="invisible">1</span>
+              <a id="to_bookmark{{ forloop.counter }}" href="javascript:void(0)">
+                <img src="{% static 'users/images/love_blue.png' %}" alt="お気に入りに登録する" >
+              </a>
+            {% else %}
+              <span id="invisible_tag_for_get_is_XHR" class="invisible">0</span>
+              <a id="to_bookmark{{ forloop.counter }}" href="{% url 'users:bookmark_regist' art.id %}">
+                <img src="{% static 'users/images/love_blue.png' %}" alt="お気に入りに登録する" >
+              </a>
+            {% endif %}
+            <!-- 非同期でお気に入り登録したら表示される、赤ハート //-->
+            <a id="layzy_love_red{{ forloop.counter }}" class="invisible" href="{% url 'users:bookmark_show' %}"><img src="{% static 'users/images/love_red.png' %}" alt=""></a>
+            <p id="layzy_love_commit_message{{ forloop.counter }}" class="album_regist_commit_message album_regist_commit_message_index invisible">Book<br><span class="fts40">Mark</span></p>
+          </p>
+
+          <p class="title"><a href="{% url 'users:article_show' art.id %}">{{ art.title|truncatechars:12}}</a></p>
+          <p class="body">{{ art.body|truncatechars:50}}</p>
+
+          <!-- 記事を書いたユーザー情報 //-->
+          <div class="user_box">
+            <a href="{% url 'users:profile_show' art.user %}">
+              {% if art.user.person.image.url %}
+                <img class="user_image" src="{{ art.user.person.image.url }}" alt="">
+              {% else %}
+                {% load static %}
+                <img class="user_image" src="{% static 'users/images/no_image_face.png' %}" alt="">
+              {% endif %}
+            </a>
+            {% if request.session.username == art.user.username %}
+              <span class="name">{{ art.user }}（あなた）</span><br>
+            {% else %}
+              <span class="name">{{ art.user }}</span><br>
+            {% endif %}
+            <span class="date">{{ art.posted_date }}</span>
+          </div>
+
+        </div>
+      {% empty %}
+        <p class="center mb10 mt100">{{ tag }} に関連する記事は見つかりませんでした。</p>
+      {% endfor %}
+      <div class="show_more_box">
+        <a id="show_more_button" class="show_more_button" href="javascript:void(0)">もっと見る</a>
+      </div>
+
+      <!-- 人気の記事（タグ or 検索訪問時のみ） //-->
+      {% if populer_articles %}
+      <div class="populer_box_top_line"></div>
+      <div class="populer_articles">
+        <p class="populer_title">その他、人気の記事</p>
+        {% for pop_art in populer_articles %}
+          <div class="populer_articles_box">
+            <!-- 写真抽出 //-->
+            <a href="{% url 'users:article_show' pop_art.id %}">
+              {% load my_templatetags %}
+              {% set selected_photo = False %}
+
+              {% for photo in populer_photos %}
+                {% if pop_art.id == photo.article.id %}
+                  <img class="art_photo lazyload" data-src="{{ photo.image.url }}" alt="">
+                  {% set selected_photo = True %}
+                {% endif %}
+
+                {% if forloop.last %}
+                  {% if not selected_photo %}
+                    {% load static %}
+                    <img class="art_photo no-image" src="{% static 'users/images/no-image.png' %}" alt="">
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </a>
+            <p class="title"><a href="{% url 'users:article_show' pop_art.id %}">{{ pop_art.title|truncatechars:12}}</a></p>
+            <p class="body">{{ pop_art.body|truncatechars:50}}</p>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+
+    </div>
+    <div id="right"></div>
+    <script type="text/javascript" src="{% static 'users/js/bookmark.js' %}"></script>
+  </div>
+{% endblock content%}
