@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'a@t5!%nsds+_rxe=^mzrncht(1tyxc2o9@mv-c%%otofcxp1@n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'django.forms',
+    # ↓のインストールは pip install django-widget-tweaks ( https://pypi.org/project/django-widget-tweaks/ )
     'widget_tweaks',
     'practice01',
 ]
