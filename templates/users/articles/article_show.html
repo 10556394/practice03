@@ -288,7 +288,7 @@
             <a href="{% url 'users:article_show' r_art.id %}">
               {% load my_templatetags %}
               {% set is_selected = False %}
-              {% for photo in r_art.art_image.all %}
+              {% for photo in r_art.art_image.all|slice:1  %}
                 {% if not is_selected and photo.is_best %}
                   <img class="r_art_img" src="{{ photo.image.url }}" alt="">
                   {% set is_selected = True %}

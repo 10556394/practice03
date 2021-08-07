@@ -84,10 +84,22 @@ WSGI_APPLICATION = 'practice01.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
+import pymysql
+pymysql.install_as_MySQLdb()
+DATABASE = {
+    'default':{
+        'ENGINE': 'django.db.backend.mysql',
+        'NAME': 'sampleapp_db',
+        'USER': 'sampleapp_user',
+        'PASSWORD': 'j7bK5piqG',
+        'HOST': '160.251.17.113',
+        'PORT': '3306',
     }
 }
 
