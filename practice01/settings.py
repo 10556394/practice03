@@ -90,15 +90,14 @@ WSGI_APPLICATION = 'practice01.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
-import pymysql
-pymysql.install_as_MySQLdb()
+
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sampleapp_db',
-        'USER': 'sampleapp_user',
-        'PASSWORD': 'j7bK5piqG',
-        'HOST': '160.251.17.113',
+        'NAME': 'sea_born',
+        'USER': 'root',
+        'PASSWORD': '413_Tanaka',
+        'HOST': '160.251.48.148',
         'PORT': '3306',
     }
 }
