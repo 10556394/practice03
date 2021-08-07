@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'practice01.wsgi.application'
 #}
 import pymysql
 pymysql.install_as_MySQLdb()
-DATABASE = {
+DATABASES = {
     'default':{
         'ENGINE': 'django.db.backend.mysql',
         'NAME': 'sampleapp_db',
